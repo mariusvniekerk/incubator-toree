@@ -20,7 +20,7 @@ import java.net.URL
 
 import org.apache.toree.interpreter.Results.Result
 import org.apache.toree.interpreter._
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
 import org.slf4j.LoggerFactory
 import py4j.GatewayServer
 
@@ -76,8 +76,8 @@ class PySparkInterpreter(
    * @param kernel The kernel
    * @return The newly initialized interpreter
    */
-  override def init(kernel: KernelLike): Interpreter = {
-    _kernel = kernel
+  override def init(kernel: BaseKernelLike): Interpreter = {
+    _kernel = kernel.asInstanceOf[KernelLike]
     this
   }
 

@@ -44,6 +44,70 @@ import scala.language.dynamics
 import scala.reflect.runtime.universe._
 import scala.util.{DynamicVariable, Try}
 
+
+abstract class AbstractKernel extends BaseKernelLike {
+
+  // Abstract memmbers that need to be implemented
+  def pluginManager: PluginManager
+  def interpreter: Interpreter
+
+  /**
+    * Represents magics available through the kernel.
+    */
+  lazy val magics = new MagicManager(pluginManager)
+
+  /**
+    * Represents magic parsing functionality.
+    */
+  lazy val magicParser = new MagicParser(magics)
+
+
+  /**
+    * Executes a block of code represented as a string and returns the result.
+    *
+    * @param code The code as an option to execute
+    * @return A tuple containing the result (true/false) and the output as a
+    *         string
+    */
+  def eval(code: Option[String]): (Boolean, String) = {
+    code.map(c => {
+      magicParser.parse(c) match {
+        case Left(parsedCode) =>
+          val output = interpreter.interpret(parsedCode)
+          handleInterpreterOutput(output)
+        case Right(errMsg) =>
+          (false, errMsg)
+      }
+    }).getOrElse((false, "Error!"))
+  }
+
+  /**
+    * Handles the output of interpreting code.
+    *
+    * @param output the output of the interpreter
+    * @return (success, message) or (failure, message)
+    */
+  private def handleInterpreterOutput(
+                                       output: (Result, Either[ExecuteOutput, ExecuteFailure])
+                                     ): (Boolean, String) = {
+    val (success, result) = output
+    success match {
+      case Results.Success =>
+        (true, result.left.getOrElse("").asInstanceOf[String])
+      case Results.Error =>
+        (false, result.right.getOrElse("").toString)
+      case Results.Aborted =>
+        (false, "Aborted!")
+      case Results.Incomplete =>
+        // If we get an incomplete it's most likely a syntax error, so
+        // let the user know.
+        (false, "Syntax Error!")
+    }
+  }
+
+}
+
+
 /**
  * Represents the main kernel API to be used for interaction.
  *
@@ -59,7 +123,7 @@ class Kernel (
   val interpreterManager: InterpreterManager,
   val comm: CommManager,
   val pluginManager: PluginManager
-) extends KernelLike with LogLike {
+) extends AbstractKernel with LogLike with KernelLike {
 
   /**
    * Represents the current input stream used by the kernel for the specific
@@ -88,75 +152,17 @@ class Kernel (
   private val currentErrorKernelMessage =
     new DynamicVariable[KernelMessage](null)
 
-  private var _sparkSession: SparkSession = null
-  def _sparkContext:SparkContext = _sparkSession.sparkContext
-  def _javaSparkContext: JavaSparkContext = new JavaSparkContext(_sparkContext)
-  //def _sqlContext = _sparkSession;
-
-  /**
-   * Represents magics available through the kernel.
-   */
-  val magics = new MagicManager(pluginManager)
-
-  /**
-   * Represents magic parsing functionality.
-   */
-  val magicParser = new MagicParser(magics)
-
-  /**
+    /**
    * Represents the data that can be shared using the kernel as the middleman.
    *
    * @note Using Java structure to enable other languages to have easy access!
    */
   val data: java.util.Map[String, Any] = new ConcurrentHashMap[String, Any]()
 
-  val interpreter = interpreterManager.defaultInterpreter.get
-
-  /**
-   * Handles the output of interpreting code.
-   *
-   * @param output the output of the interpreter
-   * @return (success, message) or (failure, message)
-   */
-  private def handleInterpreterOutput(
-    output: (Result, Either[ExecuteOutput, ExecuteFailure])
-  ): (Boolean, String) = {
-    val (success, result) = output
-    success match {
-      case Results.Success =>
-        (true, result.left.getOrElse("").asInstanceOf[String])
-      case Results.Error =>
-        (false, result.right.getOrElse("").toString)
-      case Results.Aborted =>
-        (false, "Aborted!")
-      case Results.Incomplete =>
-        // If we get an incomplete it's most likely a syntax error, so
-        // let the user know.
-        (false, "Syntax Error!")
-    }
-  }
+  override val interpreter = interpreterManager.defaultInterpreter.get
 
   override def config:Config = {
     _config
-  }
-
-  /**
-   * Executes a block of code represented as a string and returns the result.
-   *
-   * @param code The code as an option to execute
-   * @return A tuple containing the result (true/false) and the output as a
-   *         string
-   */
-  def eval(code: Option[String]): (Boolean, String) = {
-    code.map(c => {
-      magicParser.parse(c) match {
-        case Left(parsedCode) =>
-          val output = interpreter.interpret(parsedCode)
-          handleInterpreterOutput(output)
-        case Right(errMsg) =>
-          (false, errMsg)
-      }
-    }).getOrElse((false, "Error!"))
   }
 
   /**
@@ -344,36 +350,24 @@ class Kernel (
     someKernelMessage.get
   }
 
-  override def createSparkContext(conf: SparkConf): SparkContext = {
-    val sconf = createSparkConf(conf)
-    _sparkSession = SparkSession.builder.config(sconf).getOrCreate()
-
-    val sparkMaster = sconf.getOption("spark.master").getOrElse("not_set")
-    logger.info( s"Connecting to spark.master $sparkMaster")
+  override def createSparkSession(conf: SparkConf): SparkSession = {
+    val spark = super.createSparkSession(conf)
 
     // TODO: Convert to events
-    pluginManager.dependencyManager.add(sconf)
-    pluginManager.dependencyManager.add(_sparkSession)
-    pluginManager.dependencyManager.add(_sparkContext)
-    pluginManager.dependencyManager.add(_javaSparkContext)
+    pluginManager.dependencyManager.add(spark.conf)
+    pluginManager.dependencyManager.add(spark)
+    pluginManager.dependencyManager.add(sparkContext)
+    pluginManager.dependencyManager.add(javaSparkContext)
 
     pluginManager.fireEvent("sparkReady")
 
-    _sparkContext
+    spark
   }
 
-  override def createSparkContext(
+  def createSparkSession(
     master: String, appName: String
-  ): SparkContext = {
-    createSparkContext(new SparkConf().setMaster(master).setAppName(appName))
-  }
-
-  // TODO: Think of a better way to test without exposing this
-  protected[toree] def createSparkConf(conf: SparkConf) = {
-
-    logger.info("Setting deployMode to client")
-    conf.set("spark.submit.deployMode", "client")
-    conf
+  ): SparkSession = {
+    createSparkSession(createSparkConf().setMaster(master).setAppName(appName))
   }
 
   // TODO: Think of a better way to test without exposing this
@@ -401,8 +395,4 @@ class Kernel (
     interpreterManager.interpreters.get(name)
   }
 
-  override def sparkContext: SparkContext = _sparkContext
-  override def sparkConf: SparkConf = _sparkSession.sparkContext.getConf
-  override def javaSparkContext: JavaSparkContext = _javaSparkContext
-  override def sparkSession: SparkSession = _sparkSession
 }

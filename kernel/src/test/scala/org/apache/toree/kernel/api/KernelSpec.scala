@@ -198,7 +198,7 @@ class KernelSpec extends FunSpec with Matchers with MockitoSugar
         val expected = "some value"
         doReturn(expected).when(mockConfig).getString("spark.master")
 
-        val sparkConf = kernel.createSparkConf(new SparkConf().setMaster(expected))
+        val sparkConf = kernel.createSparkConf()// new SparkConf().setMaster(expected))
 
         sparkConf.get("spark.master") should be (expected)
       }

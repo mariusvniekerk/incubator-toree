@@ -17,7 +17,7 @@
 
 package org.apache.toree.interpreter.broker
 
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.{KernelLike, SparkKernelLike}
 
 /**
  * Represents the API available to the broker to act as the bridge for data
@@ -28,7 +28,7 @@ import org.apache.toree.kernel.api.KernelLike
  */
 class BrokerBridge(
   private val _brokerState: BrokerState,
-  private val _kernel: KernelLike
+  private val _kernel: SparkKernelLike
 ) extends BrokerName {
   /**
    * Represents the current state of the broker.
@@ -38,6 +38,6 @@ class BrokerBridge(
   /**
    * Represents the kernel API available.
    */
-  val kernel: KernelLike = _kernel
+  val kernel: SparkKernelLike = _kernel
 }
 

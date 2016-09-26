@@ -19,7 +19,7 @@ package org.apache.toree.interpreter
 
 import java.net.URL
 
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
 
 import scala.tools.nsc.interpreter._
 
@@ -30,7 +30,7 @@ trait Interpreter {
    * @param kernel The kernel
    * @return The newly initialized interpreter
    */
-  def init(kernel: KernelLike): Interpreter
+  def init(kernel: BaseKernelLike): Interpreter
 
   /**
    * Starts the interpreter, initializing any internal state.

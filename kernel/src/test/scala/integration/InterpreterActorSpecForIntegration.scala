@@ -24,7 +24,7 @@ import akka.testkit.{ImplicitSender, TestKit}
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.toree.interpreter._
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
 import org.apache.toree.kernel.interpreter.scala.ScalaInterpreter
 import org.apache.toree.kernel.protocol.v5._
 import org.apache.toree.kernel.protocol.v5.content._
@@ -57,7 +57,7 @@ class InterpreterActorSpecForIntegration extends TestKit(
   private val interpreter = new ScalaInterpreter {
     override protected val multiOutputStream = MultiOutputStream(List(mock[OutputStream], lastResultOut))
 
-    override protected def bindKernelVariable(kernel: KernelLike): Unit = { }
+    override protected def bindKernelVariable(kernel: BaseKernelLike): Unit = { }
   }
 
   private val conf = new SparkConf()

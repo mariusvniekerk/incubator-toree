@@ -21,7 +21,7 @@ import java.net.URL
 
 import org.apache.toree.interpreter.Results.Result
 import org.apache.toree.interpreter.{ExecuteFailure, ExecuteOutput, Interpreter}
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
 
 import scala.tools.nsc.interpreter.{InputStream, OutputStream}
 
@@ -120,5 +120,5 @@ class DummyInterpreter(kernel: KernelLike) extends Interpreter {
    * @param kernel The kernel
    * @return The newly initialized interpreter
    */
-  override def init(kernel: KernelLike): Interpreter = ???
+  override def init(kernel: BaseKernelLike): Interpreter = ???
 }

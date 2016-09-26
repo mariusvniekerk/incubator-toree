@@ -26,9 +26,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.repl.Main
-
 import org.apache.toree.interpreter._
-import org.apache.toree.kernel.api.{KernelLike, KernelOptions}
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike, KernelOptions}
 import org.apache.toree.utils.{MultiOutputStream, TaskManager}
 import org.slf4j.LoggerFactory
 
@@ -78,7 +77,7 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
     *
     * @return The newly initialized interpreter
     */
-   override def init(kernel: KernelLike): Interpreter = {
+   override def init(kernel: BaseKernelLike): Interpreter = {
      val args = interpreterArgs(kernel)
      settings = newSettings(args)
      settings = appendClassPath(settings)
@@ -112,7 +111,7 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
      urls.foldLeft("")((l, r) => ClassPath.join(l, r.toString))
    }
 
-   protected def interpreterArgs(kernel: KernelLike): List[String] = {
+   protected def interpreterArgs(kernel: BaseKernelLike): List[String] = {
      import scala.collection.JavaConverters._
      if (kernel == null || kernel.config == null) {
        List()
@@ -126,7 +125,7 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
      kernel.config.getInt("max_interpreter_threads")
    }
 
-   protected def bindKernelVariable(kernel: KernelLike): Unit = {
+   protected def bindKernelVariable(kernel: BaseKernelLike): Unit = {
      logger.warn(s"kernel variable: ${kernel}")
 //     InterpreterHelper.kernelLike = kernel
 //     interpret("import org.apache.toree.kernel.interpreter.scala.InterpreterHelper")
@@ -137,7 +136,7 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
      doQuietly {
 
        bind(
-         "kernel", "org.apache.toree.kernel.api.Kernel",
+         "kernel", kernel.getClass.getName,
          kernel, List( """@transient implicit""")
        )
      }
