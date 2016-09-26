@@ -100,7 +100,7 @@ trait StandardComponentInitialization extends ComponentInitialization {
 
   def initializeSparkContext(config:Config, kernel:Kernel, appName:String) = {
     if(!config.getBoolean("nosparkcontext")) {
-      kernel.createSparkContext(config.getString("spark.master"), appName)
+      kernel.createSparkSession(config.getString("spark.master"), appName)
     }
   }
 
@@ -169,8 +169,8 @@ trait StandardComponentInitialization extends ComponentInitialization {
       commManager,
       pluginManager
     ){
-      override protected[toree] def createSparkConf(conf: SparkConf) = {
-        val theConf = super.createSparkConf(conf)
+      override def createSparkConf(): SparkConf = {
+        val theConf = super.createSparkConf()
 
         // TODO: Move SparkIMain to private and insert in a different way
         logger.warn("Locked to Scala interpreter with SparkIMain until decoupled!")

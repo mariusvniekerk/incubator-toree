@@ -17,7 +17,7 @@
 package org.apache.toree.kernel.interpreter.sparkr
 
 import org.apache.toree.interpreter.broker.{BrokerBridge, BrokerState}
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.{KernelLike, SparkKernelLike}
 
 /**
  * Represents constants for the SparkR bridge.
@@ -53,7 +53,7 @@ object SparkRBridge {
    */
   def apply(
     brokerState: BrokerState,
-    kernel: KernelLike
+    kernel: SparkKernelLike
     ): SparkRBridge = {
     new SparkRBridge(
       _brokerState = brokerState,
@@ -71,7 +71,7 @@ object SparkRBridge {
  */
 class SparkRBridge private (
   private val _brokerState: BrokerState,
-  private val _kernel: KernelLike
+  private val _kernel: SparkKernelLike
 ) extends BrokerBridge(_brokerState, _kernel) {
   override val brokerName: String = "SparkR"
 }

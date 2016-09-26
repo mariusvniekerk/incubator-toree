@@ -19,7 +19,7 @@ package integration
 
 import java.io.OutputStream
 
-import org.apache.toree.kernel.api.Kernel
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
 import org.apache.toree.kernel.interpreter.scala.ScalaInterpreter
 import org.apache.toree.kernel.protocol.v5.magic.PostProcessor
 import org.apache.toree.utils.{MultiOutputStream}
@@ -37,6 +37,7 @@ class PostProcessorSpecForIntegration extends FunSpec with Matchers
     //       for performance improvements
     scalaInterpreter = new ScalaInterpreter {
       override protected val multiOutputStream = MultiOutputStream(List(mock[OutputStream], lastResultOut))
+      override protected def bindKernelVariable(kernel: BaseKernelLike): Unit = { }
     }
 
     scalaInterpreter.init(mock[Kernel])

@@ -20,7 +20,7 @@ import java.net.URL
 
 import org.apache.toree.interpreter.Results.Result
 import org.apache.toree.interpreter._
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.BaseKernelLike
 import org.apache.toree.kernel.BuildInfo
 import org.slf4j.LoggerFactory
 
@@ -37,7 +37,7 @@ import scala.tools.nsc.interpreter.{InputStream, OutputStream}
 class SparkRInterpreter(
 ) extends Interpreter {
   private val logger = LoggerFactory.getLogger(this.getClass)
-  private var _kernel: KernelLike = _
+  private var _kernel: BaseKernelLike = _
   private val rScriptExecutable = "Rscript"
 
   // TODO: Replace hard-coded maximum queue count
@@ -69,7 +69,7 @@ class SparkRInterpreter(
   )
   private lazy val sparkRTransformer = new SparkRTransformer
 
-  override def init(kernel: KernelLike): Interpreter = {
+  override def init(kernel: BaseKernelLike): Interpreter = {
     _kernel = kernel
     this
   }

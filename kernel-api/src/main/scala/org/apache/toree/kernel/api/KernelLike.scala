@@ -25,13 +25,44 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{SQLContext, SparkSession}
 
 /**
+  * Interface for the kernel that removes some of the
+  *
+  */
+
+trait SparkKernelLike {
+
+  def sparkContext: SparkContext = sparkSession.sparkContext
+
+  def sparkConf: SparkConf = sparkSession.sparkContext.getConf
+
+  def javaSparkContext: JavaSparkContext = new JavaSparkContext(sparkContext)
+
+  private var _sparkSession: SparkSession = _
+
+  def sparkSession: SparkSession = _sparkSession
+
+  def createSparkConf(): SparkConf = {
+    new SparkConf().set("spark.submit.deployMode", "client")
+  }
+
+  def createSparkSession(conf: SparkConf) = {
+    _sparkSession = SparkSession.builder().config(conf).getOrCreate()
+    _sparkSession
+  }
+
+}
+
+trait BaseKernelLike extends SparkKernelLike {
+
+  def config: Config
+
+}
+
+
+/**
  * Interface for the kernel API. This does not include exposed variables.
  */
-trait KernelLike {
-
-  def createSparkContext(conf: SparkConf): SparkContext
-
-  def createSparkContext(master: String, appName: String): SparkContext
+trait KernelLike extends BaseKernelLike {
 
   /**
    * Executes a block of code represented as a string and returns the result.
@@ -103,13 +134,4 @@ trait KernelLike {
 
   def interpreter(name: String): Option[org.apache.toree.interpreter.Interpreter]
 
-  def config: Config
-
-  def sparkContext: SparkContext
-
-  def sparkConf: SparkConf
-
-  def javaSparkContext: JavaSparkContext
-
-  def sparkSession: SparkSession
 }

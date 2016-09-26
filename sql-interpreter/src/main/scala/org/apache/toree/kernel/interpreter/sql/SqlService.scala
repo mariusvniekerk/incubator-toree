@@ -19,7 +19,7 @@ package org.apache.toree.kernel.interpreter.sql
 import java.io.ByteArrayOutputStream
 
 import org.apache.toree.interpreter.broker.BrokerService
-import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.kernel.api.SparkKernelLike
 import org.apache.toree.kernel.interpreter.sql.SqlTypes._
 
 import scala.concurrent.Future
@@ -32,7 +32,7 @@ import scala.tools.nsc.interpreter._
  * @param kernel The SQL Context of Apache Spark to use to perform SQL
  *                   queries
  */
-class SqlService(private val kernel: KernelLike) extends BrokerService {
+class SqlService(private val kernel: SparkKernelLike) extends BrokerService {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   @volatile private var _isRunning: Boolean = false
