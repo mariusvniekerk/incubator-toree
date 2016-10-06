@@ -17,7 +17,8 @@
 
 package org.apache.toree.kernel.protocol.v5.magic
 
-import org.apache.toree.interpreter.{ExecuteOutput, Interpreter}
+import org.apache.toree.interpreter.Interpreter
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.kernel.protocol.v5.{Data, MIMEType}
 import org.apache.toree.magic.{CellMagicOutput, LineMagicOutput}
 import org.apache.toree.utils.LogLike

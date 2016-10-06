@@ -22,7 +22,7 @@ import java.io.{ByteArrayOutputStream, OutputStream}
 import org.apache.toree.annotations.SbtForked
 import org.apache.toree.global.StreamState
 import org.apache.toree.interpreter._
-import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
+import org.apache.toree.kernel.api.{BaseKernelLike}
 import org.apache.toree.kernel.interpreter.scala.ScalaInterpreter
 import org.apache.toree.utils.{MultiOutputStream, TaskManager}
 import org.scalatest.mock.MockitoSugar
@@ -43,7 +43,7 @@ class AddExternalJarMagicSpecForIntegration
       override protected def bindKernelVariable(kernel: BaseKernelLike): Unit = { }
     }
     // interpreter.start()
-    interpreter.init(mock[KernelLike])
+    interpreter.init(mock[BaseKernelLike])
 
     StreamState.setStreams(outputStream = outputResult)
   }

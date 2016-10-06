@@ -33,6 +33,7 @@ import org.apache.toree.kernel.protocol.v5.interpreter.tasks.InterpreterTaskFact
 import org.apache.toree.utils.MultiOutputStream
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
 import test.utils.UncaughtExceptionSuppression

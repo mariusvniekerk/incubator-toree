@@ -146,27 +146,7 @@ trait ScalaInterpreterSpecific extends SettingsProducerLike { this: ScalaInterpr
     require(iMain != null)
     val sIMain = iMain
 
-    val bindRep = new sIMain.ReadEvalPrint()
-    iMain.interpret(s"import $typeName")
-    bindRep.compile("""
-                      |object %s {
-                      |  var value: %s = _
-                      |  def set(x: Any) = value = x.asInstanceOf[%s]
-                      |}
-                    """.stripMargin.format(bindRep.evalName, typeName, typeName)
-    )
-    bindRep.callEither("set", value) match {
-      case Left(ex) =>
-        logger.error("Set failed in bind(%s, %s, %s)".format(variableName, typeName, value))
-        logger.error(util.stackTraceString(ex))
-        IR.Error
-
-      case Right(_) =>
-        val line = "%sval %s = %s.value".format(modifiers map (_ + " ") mkString, variableName, bindRep.evalPath)
-        logger.debug("Interpreting: " + line)
-        iMain.interpret(line)
-    }
-
+    iMain.bind(variableName, typeName, value, modifiers)
   }
 
 

@@ -18,6 +18,7 @@ package org.apache.toree.kernel.interpreter.pyspark
 
 import java.net.URL
 
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter.Results.Result
 import org.apache.toree.interpreter._
 import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}

@@ -22,11 +22,12 @@ import java.io.OutputStream
 import akka.actor.Actor
 import akka.pattern._
 import akka.util.Timeout
-import org.apache.toree.interpreter.{ExecuteAborted, ExecuteError, ExecuteFailure, ExecuteOutput}
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
+import org.apache.toree.interpreter.{ExecuteAborted, ExecuteError, ExecuteFailure}
 import org.apache.toree.kernel.protocol.v5._
 import org.apache.toree.kernel.protocol.v5.content._
 import org.apache.toree.kernel.protocol.v5.kernel.ActorLoader
-import org.apache.toree.kernel.protocol.v5.magic.{PostProcessor, MagicParser}
+import org.apache.toree.kernel.protocol.v5.magic.{MagicParser, PostProcessor}
 import org.apache.toree.plugins.PluginManager
 import org.apache.toree.utils.LogLike
 

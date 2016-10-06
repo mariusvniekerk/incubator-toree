@@ -13,7 +13,7 @@ import org.apache.toree.plugins.PluginManager
   * to a preexisting spark session.  The primary purpose of this is to allow users to supply
   * their own mechanism for communicating with this interactive session.
   */
-class SimpleSparkInterpreter(existingSparkSession: SparkSession) extends AbstractKernel {
+class SimpleSparkInterpreter(existingSparkSession: SparkSession) extends AbstractKernel with SparkKernelLike {
 
   override def sparkSession: SparkSession = existingSparkSession
 

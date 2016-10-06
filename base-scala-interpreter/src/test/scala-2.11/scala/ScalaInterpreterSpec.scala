@@ -20,6 +20,7 @@ package org.apache.toree.kernel.interpreter.scala
 import java.io.{InputStream, OutputStream}
 import java.net.{URL, URLClassLoader}
 
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter.Results.Result
 import org.apache.toree.interpreter._
 import org.apache.toree.utils.TaskManager

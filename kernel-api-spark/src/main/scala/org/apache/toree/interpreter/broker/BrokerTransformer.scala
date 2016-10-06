@@ -19,10 +19,11 @@ package org.apache.toree.interpreter.broker
 
 import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter.Results.Result
-import org.apache.toree.interpreter.broker.BrokerTypes.CodeResults
 import org.apache.toree.interpreter.{ExecuteError, ExecuteFailure, Results}
 
 import scala.concurrent.Future
+import BrokerTypes._
+
 
 /**
  * Represents a utility that can transform raw broker information to

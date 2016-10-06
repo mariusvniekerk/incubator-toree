@@ -17,6 +17,7 @@
 
 package org.apache.toree.magic.builtin
 
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter._
 import org.apache.toree.kernel.protocol.v5.MIMEType
 import org.apache.toree.magic.dependencies.IncludeKernelInterpreter

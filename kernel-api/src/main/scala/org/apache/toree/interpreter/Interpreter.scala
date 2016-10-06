@@ -17,11 +17,11 @@
 
 package org.apache.toree.interpreter
 
+import java.io.{InputStream, OutputStream}
 import java.net.URL
 
-import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
-
-import scala.tools.nsc.interpreter._
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
+import org.apache.toree.kernel.api.BaseKernelLike
 
 case class LanguageInfo(
                  name: String,

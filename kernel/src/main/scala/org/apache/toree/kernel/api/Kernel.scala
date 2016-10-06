@@ -29,6 +29,7 @@ import org.apache.toree.boot.layer.InterpreterManager
 import org.apache.toree.comm.CommManager
 import org.apache.toree.global
 import org.apache.toree.global.ExecuteRequestState
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter.Results.Result
 import org.apache.toree.interpreter._
 import org.apache.toree.kernel.protocol.v5

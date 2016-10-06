@@ -18,9 +18,10 @@ package org.apache.toree.kernel.interpreter.sql
 
 import java.net.URL
 
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter.Results.Result
-import org.apache.toree.interpreter._
-import org.apache.toree.kernel.api.BaseKernelLike
+import org.apache.toree.interpreter.{ExecuteFailure, Interpreter}
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
 import org.apache.toree.kernel.BuildInfo
 
 import scala.concurrent.Await
@@ -31,12 +32,12 @@ import scala.tools.nsc.interpreter.{InputStream, OutputStream}
  * Represents an interpreter interface to Spark SQL.
  */
 class SqlInterpreter() extends Interpreter {
-  private var _kernel: BaseKernelLike = _
+  private var _kernel: KernelLike = _
   private lazy val sqlService = new SqlService(_kernel)
   private lazy val sqlTransformer = new SqlTransformer
 
   override def init(kernel: BaseKernelLike): Interpreter = {
-    _kernel = kernel
+    _kernel = kernel.asInstanceOf[KernelLike]
     this
   }
 

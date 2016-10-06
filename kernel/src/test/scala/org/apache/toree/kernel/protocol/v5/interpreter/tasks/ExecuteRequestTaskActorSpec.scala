@@ -22,10 +22,11 @@ import java.io.OutputStream
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import com.typesafe.config.ConfigFactory
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter._
 import org.apache.toree.kernel.protocol.v5._
 import org.apache.toree.kernel.protocol.v5.content._
-import org.mockito.Matchers.{anyBoolean, anyString, anyObject}
+import org.mockito.Matchers.{anyBoolean, anyObject, anyString}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{FunSpecLike, Matchers}
@@ -60,8 +61,8 @@ class ExecuteRequestTaskActorSpec extends TestKit(
           ))
 
         val executeRequest = (ExecuteRequest(
-          "val x = 3", false, false,
-          UserExpressions(), false
+          "val x = 3", silent = false, store_history = false,
+          UserExpressions(), allow_stdin = false
         ), mock[KernelMessage], mock[OutputStream])
 
         executeRequestTask ! executeRequest

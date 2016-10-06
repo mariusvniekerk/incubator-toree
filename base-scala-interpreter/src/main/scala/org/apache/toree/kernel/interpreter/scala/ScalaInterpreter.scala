@@ -23,8 +23,9 @@ import java.nio.charset.Charset
 import java.util.concurrent.ExecutionException
 
 import com.typesafe.config.{Config, ConfigFactory}
+import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter._
-import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike, KernelOptions}
+import org.apache.toree.kernel.api.{BaseKernelLike, KernelOptions}
 import org.apache.toree.utils.{MultiOutputStream, TaskManager}
 import org.slf4j.LoggerFactory
 
@@ -116,7 +117,7 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
      }
    }
 
-   protected def maxInterpreterThreads(kernel: KernelLike): Int = {
+   protected def maxInterpreterThreads(kernel: BaseKernelLike): Int = {
      kernel.config.getInt("max_interpreter_threads")
    }
 

@@ -16,13 +16,13 @@
  */
 package org.apache.toree.kernel.interpreter.pyspark
 
-import java.io.{FileOutputStream, File}
+import java.io.{File, FileOutputStream}
 
-import org.apache.toree.interpreter.broker.BrokerProcess
 import org.apache.commons.exec.environment.EnvironmentUtils
 import org.apache.commons.exec._
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkContext
+import org.apache.toree.interpreter.broker.BrokerProcess
 import org.slf4j.LoggerFactory
 
 /**

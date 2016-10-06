@@ -17,6 +17,7 @@
 package org.apache.toree.kernel.interpreter.sparkr
 
 import org.apache.toree.interpreter.broker.BrokerProcess
+
 import scala.collection.JavaConverters._
 
 /**

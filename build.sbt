@@ -32,9 +32,9 @@ lazy val root = ToreeProject("toree", ".", doFork=false, needsSpark=true).
     aggregate in assembly := false,
     unmanagedResourceDirectories in Compile += { baseDirectory.value / "dist/toree-legal" }
   ).aggregate(
-    macros,protocol,plugins,communication,kernelApi,client,baseScalaInterpreter,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
+    macros,protocol,plugins,communication,kernelApi,kernelApiSpark,client,baseScalaInterpreter,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
   ).dependsOn(
-    macros,protocol,communication,kernelApi,client,baseScalaInterpreter,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
+    macros,protocol,communication,kernelApi,kernelApiSpark,client,baseScalaInterpreter,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
   )
 
 /**
@@ -65,7 +65,15 @@ lazy val communication = ToreeProject("communication").dependsOn(macros, protoco
 * Project representing the kernel-api code used by the Spark Kernel. Others can
 * import this to implement their own magics and plugins.
 */
-lazy val kernelApi = ToreeProject("kernel-api", needsSpark=true).dependsOn(macros, plugins)
+lazy val kernelApi = ToreeProject("kernel-api", needsSpark=false)
+  .dependsOn(macros, plugins)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % buildScalaVersion
+    )
+  )
+
+lazy val kernelApiSpark = ToreeProject("kernel-api-spark", needsSpark = true).dependsOn(kernelApi)
 
 /**
 * Project representing the client code for connecting to the kernel backend.
@@ -86,22 +94,22 @@ lazy val baseScalaInterpreter = ToreeProject("base-scala-interpreter", needsSpar
 /**
 * Project represents the scala interpreter used by the Spark Kernel.
 */
-lazy val scalaInterpreter = ToreeProject("scala-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApi, baseScalaInterpreter)
+lazy val scalaInterpreter = ToreeProject("scala-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApiSpark, baseScalaInterpreter)
 
 /**
 * Project represents the SQL interpreter used by the Spark Kernel.
 */
-lazy val sqlInterpreter = ToreeProject("sql-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApi)
+lazy val sqlInterpreter = ToreeProject("sql-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApiSpark)
 
 /**
 * Project represents the Python interpreter used by the Spark Kernel.
 */
-lazy val pysparkInterpreter = ToreeProject("pyspark-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApi)
+lazy val pysparkInterpreter = ToreeProject("pyspark-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApiSpark)
 
 /**
 * Project represents the R interpreter used by the Spark Kernel.
 */
-lazy val sparkrInterpreter = ToreeProject("sparkr-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApi)
+lazy val sparkrInterpreter = ToreeProject("sparkr-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApiSpark)
 
 /**
 * Project representing the kernel code for the Spark Kernel backend.
@@ -111,6 +119,7 @@ lazy val kernel = ToreeProject("kernel", doFork=true, needsSpark=true).dependsOn
   protocol % "test->test;compile->compile",
   communication % "test->test;compile->compile",
   kernelApi % "test->test;compile->compile",
+  kernelApiSpark % "test->test;compile->compile",
   pysparkInterpreter % "test->test;compile->compile",
   baseScalaInterpreter % "test->test;compile->compile",
   scalaInterpreter % "test->test;compile->compile",

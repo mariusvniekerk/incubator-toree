@@ -19,10 +19,10 @@ package integration
 
 import java.io.OutputStream
 
-import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
+import org.apache.toree.kernel.api.{BaseKernelLike, Kernel, KernelLike}
 import org.apache.toree.kernel.interpreter.scala.ScalaInterpreter
 import org.apache.toree.kernel.protocol.v5.magic.PostProcessor
-import org.apache.toree.utils.{MultiOutputStream}
+import org.apache.toree.utils.MultiOutputStream
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 

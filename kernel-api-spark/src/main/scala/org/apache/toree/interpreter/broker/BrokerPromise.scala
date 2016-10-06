@@ -15,14 +15,15 @@
  *  limitations under the License
  */
 
-package org.apache.toree
+package org.apache.toree.interpreter.broker
 
-// TODO: Deprecate and remove this package object as it is difficult to
-//       remember where this type comes from
-package object interpreter {
-  /**
-   * Represents the output from an interpret execution.
-   */
-  type ExecuteOutput = String
+import scala.concurrent.Promise
+import BrokerTypes._
 
-}
+/**
+ * Represents a promise made regarding the completion of broker code execution.
+ *
+ * @param codeId The id of the code that was executed
+ * @param promise The promise to be fulfilled when the code finishes executing
+ */
+case class BrokerPromise(codeId: CodeId, promise: Promise[CodeResults])

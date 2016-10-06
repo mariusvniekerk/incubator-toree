@@ -19,11 +19,12 @@ package org.apache.toree.interpreter.broker
 
 import java.util.concurrent.ConcurrentHashMap
 
-import org.apache.toree.interpreter.broker.BrokerTypes._
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{Future, Promise}
 import scala.tools.nsc.interpreter.OutputStream
+import BrokerTypes._
+
 
 /**
  * Represents the state structure of broker.
