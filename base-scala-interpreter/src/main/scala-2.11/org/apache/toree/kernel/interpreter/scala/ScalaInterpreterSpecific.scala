@@ -127,6 +127,8 @@ trait ScalaInterpreterSpecific extends SettingsProducerLike { this: ScalaInterpr
 
   }
 
+
+  // TODO: See if we actually need this?  Looks too complicated
   /**
    * Binds a variable in the interpreter to a value.
    * @param variableName The name to expose the value in the interpreter
@@ -266,6 +268,10 @@ trait ScalaInterpreterSpecific extends SettingsProducerLike { this: ScalaInterpr
     }
   }
 
+  def startupImports(iMain: IMain): Unit = {
+
+  }
+
   /**
    * Starts the interpreter, initializing any internal state.
    * @return A reference to the interpreter
@@ -289,10 +295,7 @@ trait ScalaInterpreterSpecific extends SettingsProducerLike { this: ScalaInterpr
     iMain.beQuietDuring {
       //logger.info("Rerouting Console and System related input and output")
       //updatePrintStreams(System.in, multiOutputStream, multiOutputStream)
-
-      //   ADD IMPORTS generates too many classes, client is responsible for adding import
-      logger.debug("Adding org.apache.spark.SparkContext._ to imports")
-      iMain.interpret("import org.apache.spark.SparkContext._")
+      startupImports(iMain)
 
       logger.debug("Adding the hack for the exception handling retrieval.")
       iMain.bind("_exceptionHack", classOf[ExceptionHack].getName, exceptionHack, List("@transient"))
@@ -344,13 +347,6 @@ trait ScalaInterpreterSpecific extends SettingsProducerLike { this: ScalaInterpr
   override def newSettings(args: List[String]): Settings = {
     val s = new Settings()
 
-    val dir = ScalaInterpreter.ensureTemporaryFolder()
-
-    s.processArguments(args ++
-      List(
-        "-Yrepl-class-based",
-        "-Yrepl-outdir", s"$dir"
-    ), processAll = true)
     s
   }
 

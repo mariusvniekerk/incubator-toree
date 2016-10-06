@@ -40,7 +40,7 @@ import scala.tools.nsc.interpreter.{IR, OutputStream}
 import scala.tools.nsc.util.ClassPath
 import scala.util.{Try => UtilTry}
 
-class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends Interpreter with ScalaInterpreterSpecific {
+class SparkScalaInterpreter(private val config:Config = ConfigFactory.load) extends ScalaInterpreter {
    protected val logger = LoggerFactory.getLogger(this.getClass.getName)
 
    protected val _thisClassloader = this.getClass.getClassLoader
@@ -79,12 +79,8 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
     * @return The newly initialized interpreter
     */
    override def init(kernel: BaseKernelLike): Interpreter = {
-     val args = interpreterArgs(kernel)
-     settings = newSettings(args)
-     settings = appendClassPath(settings)
+     super.init(kernel)
 
-     start()
-     bindKernelVariable(kernel)
      bindSparkSession()
      bindSparkContext()
 
@@ -314,6 +310,19 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
      }
    }
 
+  override def newSettings() = {
+    val s = super.newSettings()
+
+    val dir = SparkScalaInterpreter.ensureTemporaryFolder()
+
+    s.processArguments(args ++
+      List(
+        "-Yrepl-class-based",
+        "-Yrepl-outdir", s"$dir"
+      ), processAll = true)
+
+  }
+
    override def classLoader: ClassLoader = _runtimeClassloader
 
   /**
@@ -322,7 +331,7 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
   override def languageInfo = LanguageInfo("scala", BuildInfo.scalaVersion, fileExtension = Some(".scala"))
 }
 
-object ScalaInterpreter {
+object SparkScalaInterpreter {
 
   /**
     * Utility method to ensure that a temporary directory for the REPL exists for testing purposes.
