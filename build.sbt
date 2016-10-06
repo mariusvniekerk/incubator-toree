@@ -32,9 +32,9 @@ lazy val root = ToreeProject("toree", ".", doFork=false, needsSpark=true).
     aggregate in assembly := false,
     unmanagedResourceDirectories in Compile += { baseDirectory.value / "dist/toree-legal" }
   ).aggregate(
-    macros,protocol,plugins,communication,kernelApi,client,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
+    macros,protocol,plugins,communication,kernelApi,client,baseScalaInterpreter,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
   ).dependsOn(
-    macros,protocol,communication,kernelApi,client,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
+    macros,protocol,communication,kernelApi,client,baseScalaInterpreter,scalaInterpreter,sqlInterpreter,pysparkInterpreter,sparkrInterpreter,kernel
   )
 
 /**
@@ -73,9 +73,20 @@ lazy val kernelApi = ToreeProject("kernel-api", needsSpark=true).dependsOn(macro
 lazy val client = ToreeProject("client").dependsOn(macros, protocol, communication)
 
 /**
+  * Project represents the base scala interpreter.
+  */
+lazy val baseScalaInterpreter = ToreeProject("base-scala-interpreter", needsSpark=false)
+  .dependsOn(plugins, protocol, kernelApi)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % buildScalaVersion
+    )
+  )
+
+/**
 * Project represents the scala interpreter used by the Spark Kernel.
 */
-lazy val scalaInterpreter = ToreeProject("scala-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApi)
+lazy val scalaInterpreter = ToreeProject("scala-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApi, baseScalaInterpreter)
 
 /**
 * Project represents the SQL interpreter used by the Spark Kernel.
@@ -101,6 +112,7 @@ lazy val kernel = ToreeProject("kernel", doFork=true, needsSpark=true).dependsOn
   communication % "test->test;compile->compile",
   kernelApi % "test->test;compile->compile",
   pysparkInterpreter % "test->test;compile->compile",
+  baseScalaInterpreter % "test->test;compile->compile",
   scalaInterpreter % "test->test;compile->compile",
   sparkrInterpreter % "test->test;compile->compile",
   sqlInterpreter % "test->test;compile->compile"

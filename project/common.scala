@@ -32,7 +32,7 @@ object Common {
   private val gpgPassword               = Properties.envOrElse("GPG_PASSWORD","")
   private val buildOrganization         = "org.apache.toree.kernel"
   private val buildVersion              = if (snapshot) s"$versionNumber-SNAPSHOT" else versionNumber
-  private val buildScalaVersion         = "2.11.8"
+  val buildScalaVersion                 = "2.11.8"
 //  private val buildScalaVersion         = "2.10.6"
 
   val buildInfoSettings = Seq(
