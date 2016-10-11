@@ -94,7 +94,17 @@ lazy val baseScalaInterpreter = ToreeProject("base-scala-interpreter", needsSpar
 /**
 * Project represents the scala interpreter used by the Spark Kernel.
 */
-lazy val scalaInterpreter = ToreeProject("scala-interpreter", needsSpark=true).dependsOn(plugins, protocol, kernelApiSpark, baseScalaInterpreter)
+lazy val scalaInterpreter = ToreeProject("scala-interpreter", needsSpark=true)
+  .dependsOn(plugins, protocol, kernelApiSpark, baseScalaInterpreter)
+
+/**
+  * Project represents the scala interpreter used by the Flink Kernel.
+  */
+lazy val scalaInterpreterFlink = ToreeProject("scala-interpreter-flink", needsSpark=false)
+  .dependsOn(plugins, protocol, kernelApi, baseScalaInterpreter)
+  .settings(
+    libraryDependencies += "org.apache.flink" %% "flink-scala-shell" % "1.1.2"
+  )
 
 /**
 * Project represents the SQL interpreter used by the Spark Kernel.
