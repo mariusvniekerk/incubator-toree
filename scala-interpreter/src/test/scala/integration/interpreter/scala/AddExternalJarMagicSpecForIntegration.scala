@@ -19,6 +19,8 @@ package integration.interpreter.scala
 
 import java.io.{ByteArrayOutputStream, OutputStream}
 
+import org.apache.spark.SparkContext
+import org.apache.spark.compat.ToreeSparkUtils
 import org.apache.toree.annotations.SbtForked
 import org.apache.toree.global.StreamState
 import org.apache.toree.interpreter._
@@ -35,8 +37,14 @@ class AddExternalJarMagicSpecForIntegration
 
   private val outputResult = new ByteArrayOutputStream()
   private var interpreter: Interpreter = _
+  private var initialClassLoader: ClassLoader = _
 
   before {
+
+    initialClassLoader = Thread.currentThread().getContextClassLoader
+    Thread.currentThread().setContextClassLoader(
+      ToreeSparkUtils.makeClassloader(initialClassLoader))
+
     interpreter = new ScalaInterpreter {
       override protected val multiOutputStream = MultiOutputStream(List(mock[OutputStream], lastResultOut))
 
@@ -51,6 +59,7 @@ class AddExternalJarMagicSpecForIntegration
   after {
     interpreter.stop()
     outputResult.reset()
+    Thread.currentThread().setContextClassLoader(initialClassLoader)
   }
 
   describe("ScalaInterpreter") {
@@ -71,8 +80,9 @@ class AddExternalJarMagicSpecForIntegration
         interpreter.addJars(testJarUrl)
 
         // Should now succeed
-        interpreter.interpret(
-          "import com.ibm.testjar.TestClass")._1 should be (Results.Success)
+        val o = interpreter.interpret(
+          "import com.ibm.testjar.TestClass")._1
+        o should be (Results.Success)
 
         // Should now run
         interpreter.interpret(

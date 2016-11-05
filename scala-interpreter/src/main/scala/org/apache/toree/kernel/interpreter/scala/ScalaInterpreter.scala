@@ -24,9 +24,9 @@ import java.util.concurrent.ExecutionException
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.SparkContext
+import org.apache.spark.compat.ToreeSparkUtils
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.repl.Main
-
 import org.apache.toree.interpreter._
 import org.apache.toree.kernel.api.{KernelLike, KernelOptions}
 import org.apache.toree.utils.{MultiOutputStream, TaskManager}
@@ -43,7 +43,7 @@ import scala.util.{Try => UtilTry}
 class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends Interpreter with ScalaInterpreterSpecific {
    protected val logger = LoggerFactory.getLogger(this.getClass.getName)
 
-   protected val _thisClassloader = this.getClass.getClassLoader
+   protected val _thisClassloader = ToreeSparkUtils.getSparkClassLoader
 
    protected val lastResultOut = new ByteArrayOutputStream()
 
@@ -155,6 +155,7 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
    override def interpret(code: String, silent: Boolean = false, output: Option[OutputStream]):
     (Results.Result, Either[ExecuteOutput, ExecuteFailure]) = {
       val starting = (Results.Success, Left(""))
+
       interpretRec(code.trim.split("\n").toList, false, starting)
    }
 
@@ -297,6 +298,8 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
        logger.debug(s"Binding SQLContext into interpreter as $bindName")
 
       interpret(s"""def ${bindName}: ${classOf[SparkSession].getName} = kernel.sparkSession""")
+
+
 
 //      interpret(
 //        s"""

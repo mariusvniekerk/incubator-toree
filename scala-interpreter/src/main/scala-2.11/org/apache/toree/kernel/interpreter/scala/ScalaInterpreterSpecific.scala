@@ -18,9 +18,10 @@
 package org.apache.toree.kernel.interpreter.scala
 
 import java.io._
-import java.net.URL
+import java.net.{URL, URLClassLoader}
 import java.nio.file.Files
 
+import org.apache.spark.compat.SparkClassLoaderHelper
 import org.apache.toree.global.StreamState
 import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter.imports.printers.{WrapperConsole, WrapperSystem}
@@ -116,8 +117,12 @@ trait ScalaInterpreterSpecific extends SettingsProducerLike { this: ScalaInterpr
 //    jars.foreach(_runtimeClassloader.addJar)
 //    updateCompilerClassPath(jars : _*)
 
+    SparkClassLoaderHelper.addjars(classLoader, jars: _*)
+    val urls = classLoader.asInstanceOf[URLClassLoader].getURLs
 
-    iMain.addUrlsToClassPath(jars: _*)
+    iMain.global.extendCompilerClassPath(jars: _*)
+    iMain.global.invalidateClassPathEntries(urls.map(_.getPath.toString): _*)
+//    iMain.addUrlsToClassPath(jars: _*)
 //    iMain.
 //    _runtimeClassloader =
 
@@ -348,9 +353,11 @@ trait ScalaInterpreterSpecific extends SettingsProducerLike { this: ScalaInterpr
 
     s.processArguments(args ++
       List(
+        "-usejavacp",
         "-Yrepl-class-based",
         "-Yrepl-outdir", s"$dir"
     ), processAll = true)
+    s.embeddedDefaults(classLoader)
     s
   }
 
