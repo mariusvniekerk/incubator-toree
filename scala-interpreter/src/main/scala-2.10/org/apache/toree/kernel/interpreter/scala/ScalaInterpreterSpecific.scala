@@ -51,10 +51,10 @@ trait ScalaInterpreterSpecific { this: ScalaInterpreter =>
   var sparkIMain: SparkIMain = _
   protected var jLineCompleter: SparkJLineCompletion = _
 
-  val _runtimeClassloader =
-    new URLClassLoader(Array(), _thisClassloader) {
-      def addJar(url: URL) = this.addURL(url)
-    }
+//  val _runtimeClassloader =
+//    new URLClassLoader(Array(), _thisClassloader) {
+//      def addJar(url: URL) = this.addURL(url)
+//    }
 
   protected def newSparkIMain(
     settings: Settings, out: JPrintWriter
