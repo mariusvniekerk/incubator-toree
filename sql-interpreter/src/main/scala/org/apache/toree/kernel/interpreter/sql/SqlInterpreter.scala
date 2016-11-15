@@ -20,7 +20,7 @@ import java.net.URL
 
 import org.apache.toree.interpreter.InterpreterTypes.ExecuteOutput
 import org.apache.toree.interpreter.Results.Result
-import org.apache.toree.interpreter.{ExecuteFailure, Interpreter}
+import org.apache.toree.interpreter.{ExecuteFailure, Interpreter, LanguageInfo}
 import org.apache.toree.kernel.api.{BaseKernelLike, KernelLike}
 import org.apache.toree.kernel.BuildInfo
 

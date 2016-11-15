@@ -36,6 +36,7 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.interpreter.{IR, OutputStream}
 import scala.tools.nsc.util.ClassPath
 import scala.util.{Try => UtilTry}
+import org.apache.toree.kernel.BuildInfo
 
 class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends Interpreter with ScalaInterpreterSpecific {
    protected val logger = LoggerFactory.getLogger(this.getClass.getName)
@@ -253,4 +254,12 @@ class ScalaInterpreter(private val config:Config = ConfigFactory.load) extends I
    }
 
    override def classLoader: ClassLoader = _runtimeClassloader
+
+  /** Returns the language metadata for syntax highlighting
+    */
+  def languageInfo: _root_.org.apache.toree.interpreter.LanguageInfo = {
+    LanguageInfo("scala", BuildInfo.scalaVersion, Some("*.scala"), pygmentsLexer = Some("scala"))
+  }
+
+
  }
